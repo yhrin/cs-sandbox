@@ -16,17 +16,21 @@ using System.Windows.Shapes;
 namespace cammy_gomoku
 {
     /// <summary>
-    /// MainWindow.xaml の相互作用ロジック
+    /// Page1.xaml の相互作用ロジック
     /// </summary>
-    public partial class MainWindow : Window
+    public partial class Page1 : Page
     {
-        public MainWindow()
+        public Page1()
         {
-            InitializeComponent(); ;
+            InitializeComponent();
+        }
 
-            Uri uri = new Uri("/Page1.xaml", UriKind.Relative);
-            MainFrame.Source = uri;
+        private void ButtonClick(object sender, RoutedEventArgs e)
+        {
+            var page2 = new cammy_gomoku.Page2();
+            NavigationService.Navigate(page2);
 
         }
+
     }
 }

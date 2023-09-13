@@ -1,0 +1,8 @@
+# Visual Studio 環境構築
+1. VsVimの拡張機能を追加
+
+# 新規プロジェクトの作成
+1. githubにてプロジェクト作成
+2. Visual Studioにてクローン
+3. クローンしたところにC# WPF Applicationのプロジェクトを作成
+4. dotnet new gitignore でC#用の.gitignoreを作成
