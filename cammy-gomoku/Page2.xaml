@@ -16,7 +16,7 @@
 
         <Label Grid.Row="0" x:Name="HeaderLabel" Content="Player" HorizontalAlignment="Center" VerticalAlignment="Center" />
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Center" VerticalAlignment="Center" HorizontalContentAlignment="Center" VerticalContentAlignment="Center" CanContentScroll="True">
-            <Grid x:Name="Viewer"/>
+            <Grid x:Name="Viewer" Background="White" MouseUp="Viewer_MouseUp"/>
         </ScrollViewer>
     </Grid>
 </Page>

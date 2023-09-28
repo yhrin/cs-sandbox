@@ -13,8 +13,12 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+
 namespace cammy_gomoku
 {
+
+    //private record PlayerInfo(Color color);
+
     /// <summary>
     /// Page2.xaml の相互作用ロジック
     /// </summary>
@@ -27,6 +31,7 @@ namespace cammy_gomoku
         public Page2()
         {
             InitializeComponent();
+            /*
 
             Viewer.HorizontalAlignment = HorizontalAlignment.Center;
             Viewer.VerticalAlignment = VerticalAlignment.Center;
@@ -60,7 +65,7 @@ namespace cammy_gomoku
                         switch (gm.SelectPosition((x, y)))
                         {
                             case GomokuManager.ActionResult.Win:
-                                HeaderLabel.Content = $"Win Player {gm.getPlayer((x,y))}";
+                                HeaderLabel.Content = $"Win Player {gm.getPlayer((x, y))}";
                                 button.Content = (gm.getPlayer((x, y)));
                                 break;
                             case GomokuManager.ActionResult.Continue:
@@ -77,6 +82,79 @@ namespace cammy_gomoku
                     Viewer.Children.Add(button);
                 }
             }
+            */
+            InitializeCanvas();
+        }
+
+        GeometryGroup[] geometryGroups;
+
+        /* record にて設定したいが.Net Coreへの移行がわからないので現状直打ち
+        PlayerInfo[] playerInfo = { new PlayerInfo(
+        */
+
+        private Image image;
+
+
+        private void InitializeCanvas()
+        {
+            var playerColor = new List<Color> { Colors.White, Colors.Black };
+
+            var drawGroup = new DrawingGroup();
+
+            // draw board
+            var boardGeometryGroup = new GeometryGroup();
+            var boardGeometryDrawing = new GeometryDrawing();
+            boardGeometryDrawing.Geometry = boardGeometryGroup;
+            boardGeometryDrawing.Pen = new Pen(Brushes.Black, 2);
+            drawGroup.Children.Add(boardGeometryDrawing);
+            for(var i = 0; i <= 15; i++)
+            {
+                boardGeometryGroup.Children.Add(new LineGeometry(new Point(i * 40, 0), new Point(i * 40, 15 * 40)));
+                boardGeometryGroup.Children.Add(new LineGeometry(new Point(0, i * 40), new Point(15 * 40, i * 40)));
+            }
+
+            geometryGroups = Enumerable.Range(1, 2).Select((v,i) => new GeometryGroup()).ToArray();
+            foreach (var (geometryGroup, i) in geometryGroups.Select( (v,x) => (v,x)) ) {
+                var geometryDrawing = new GeometryDrawing();
+                geometryDrawing.Geometry = geometryGroup;
+                geometryDrawing.Brush = new SolidColorBrush(playerColor[i]);
+                geometryDrawing.Pen = new Pen(Brushes.Black, 5);
+                drawGroup.Children.Add(geometryDrawing);
+            }
+            var drawingImage = new DrawingImage(drawGroup);
+            image = new Image { Source = drawingImage, Stretch = Stretch.None };
+            //this.Content = image;
+            Viewer.Children.Add(image);
+        }
+
+        private int roundPosition(double x)
+        {
+            return (int)Math.Floor((x+20) / 40);
+        }
+
+        private void Viewer_MouseUp(object sender, MouseButtonEventArgs e)
+        {
+            var pos = e.GetPosition(image);
+            var x = roundPosition(pos.X);
+            var y = roundPosition(pos.Y);
+
+
+            //geometryGroups[0].Children.Add(new EllipseGeometry(new Point(pos.X, pos.Y), 20, 20));
+            switch (gm.SelectPosition((x, y)))
+            {
+                case GomokuManager.ActionResult.Win:
+                    HeaderLabel.Content = $"Win Player {gm.getPlayer((x, y))}";
+                    geometryGroups[gm.getPlayerIndex((x, y))].Children.Add(new EllipseGeometry(new Point(x * 40, y * 40), 15,15));
+                    break;
+                case GomokuManager.ActionResult.Continue:
+                    HeaderLabel.Content = $"Tern : Player {gm.getTernPlayer()}";
+                    geometryGroups[gm.getPlayerIndex((x, y))].Children.Add(new EllipseGeometry(new Point(x * 40, y * 40), 15,15));
+                    break;
+                case GomokuManager.ActionResult.FailPosition:
+                    //MessageBox.Show("Fail");
+                    break;
+            }
+
         }
     }
 
@@ -104,6 +182,10 @@ namespace cammy_gomoku
             //MessageBox.Show(String.Join(";", positions.Select(v => String.Join(",", v))));
             var p = positions.TakeWhile(x => !x.Contains(position)).Count();
             return p >= 2 ? "" : p.ToString();
+        }
+        public int getPlayerIndex((int, int) position)
+        {
+            return positions.TakeWhile(x => !x.Contains(position)).Count();
         }
 
         public string getTernPlayer()
